@@ -1,20 +1,41 @@
 {
   "name": "vs-winter-lang-tools",
-  "displayName": "VS Winter Lang Checker",
-  "description": "Une extension pour vérifier et mettre à jour les fichiers de langue dans les projets Winter CMS",
-  "version": "0.1.0",
+  "displayName": "vs-winter-lang-tools",
+  "description": "",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/charlesStOlive/vs-winter-lang-tools.git"
+  },
   "engines": {
-    "vscode": "^1.62.0"
+    "vscode": "^1.76.0"
   },
   "categories": [
     "Other"
   ],
-  "main": "./out/extension.js",
+  "activationEvents": [],
+  "main": "./src/main.js",
   "contributes": {
     "commands": [
       {
         "command": "vs-winter-lang-tools.analyzeCode",
-        "title": "Analyser le code"
+        "title": "Vérifier tous les fichiers"
+      },
+      {
+        "command": "vs-winter-lang-tools.runPhpArtisan",
+        "title": "launch simple trad"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "vs-winter-lang-tools.analyzeCode",
+        "key": "ctrl+alt+1",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "vs-winter-lang-tools.runPhpArtisan",
+        "key": "ctrl+alt+t",
+        "when": "editorTextFocus"
       }
     ],
     "configuration": {
@@ -25,33 +46,29 @@
           "items": {
             "type": "string"
           },
-          "default": ["plugins/waka/worder"],
+          "default": [
+            "plugins/waka/worder"
+          ],
           "description": "Répertoires à analyser"
         }
       }
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "node ./test/runTest.js"
   },
   "devDependencies": {
-    "@types/fs-extra": "^11.0.1",
+    "@types/vscode": "^1.76.0",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
-    "@types/vscode": "^1.76.0",
-    "@typescript-eslint/eslint-plugin": "^5.53.0",
-    "@typescript-eslint/parser": "^5.53.0",
-    "@vscode/test-electron": "^2.2.3",
     "eslint": "^8.34.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "@vscode/test-electron": "^2.2.3"
   },
   "dependencies": {
     "fs-extra": "^11.1.1",
