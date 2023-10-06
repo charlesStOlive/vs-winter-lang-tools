@@ -1,22 +1,8 @@
-const vscode = require('vscode');
 const { spawn } = require('child_process');
+const vscode = require('vscode');
 
-module.exports = async function runPhpArtisan() {
-  const editor = vscode.window.activeTextEditor;
-
-  if (!editor) {
-    vscode.window.showErrorMessage('No active editor found.');
-    return;
-  }
-
-  const selectedText = editor.document.getText(editor.selection);
-
-  if (!selectedText) {
-    vscode.window.showErrorMessage('No text selected.');
-    return;
-  }
-
-  const workspaceFolders = vscode.workspace.workspaceFolders;
+function launchEdit(selectedText) {
+const workspaceFolders = vscode.workspace.workspaceFolders;
   if (!workspaceFolders) {
     vscode.window.showErrorMessage('No workspace folder is open.');
     return;
@@ -56,7 +42,7 @@ module.exports = async function runPhpArtisan() {
       });
 
       if (createFileChoice === 'Créer le fichier') {
-        createAndInsertTranslation(selectedText);
+        createAndInsertTranslation(selectedText, rootPath, command);
       } else {
         // Annuler ou fermer la boîte de dialogue
         return;
@@ -71,12 +57,41 @@ module.exports = async function runPhpArtisan() {
         return;
       }
 
-      updateTranslation(selectedText, input);
+      updateTranslation(selectedText, input, rootPath, command);
     }
   });
+}
+async function updateTranslation(selectedText, translatedText, rootPath, command = 'php') {
+  const insertArgs = ['artisan', 'waka:tradauto', 'insert', escapeShellArg(selectedText), escapeShellArg(translatedText)];
+    const insertProcess = spawn(command, insertArgs, { cwd: rootPath });
 
-  async function createAndInsertTranslation(selectedText) {
-    const createArgs = ['artisan', 'waka:tradauto', 'create',  escapeShellArg(selectedText)];
+    let insertStdout = '';
+    insertProcess.stdout.on('data', (data) => {
+      insertStdout += data.toString();
+    });
+
+    insertProcess.stderr.on('data', (data) => {
+      vscode.window.showErrorMessage(`Error: ${data}`);
+    });
+
+    insertProcess.on('close', (code) => {
+      if (code !== 0) {
+        vscode.window.showErrorMessage(`Error: child process exited with code ${code}`);
+        return;
+      }
+
+      if (insertStdout.trim() === 'true') {
+        const editor = vscode.window.activeTextEditor;
+        editor.edit((editBuilder) => {
+          const selection = editor.selection;
+          editBuilder.replace(selection, translatedText);
+        });
+      }
+    });
+}
+
+async function createAndInsertTranslation(selectedText, rootPath, command = 'php') {
+    const createArgs = ['artisan', 'waka:tradauto', 'create', escapeShellArg(selectedText)];
     const createProcess = spawn(command, createArgs, { cwd: rootPath });
 
     let createStdout = '';
@@ -106,37 +121,10 @@ module.exports = async function runPhpArtisan() {
     });
   }
 
-  function escapeShellArg(arg) {
+function escapeShellArg(arg) {
     return `'${arg.replace(/'/g, "'\\''")}'`;
   }
 
-
-  function updateTranslation(selectedText, translatedText) {
-    const insertArgs = ['artisan', 'waka:tradauto', 'insert', escapeShellArg(selectedText), escapeShellArg(translatedText)];
-    const insertProcess = spawn(command, insertArgs, { cwd: rootPath });
-
-    let insertStdout = '';
-    insertProcess.stdout.on('data', (data) => {
-      insertStdout += data.toString();
-    });
-
-    insertProcess.stderr.on('data', (data) => {
-      vscode.window.showErrorMessage(`Error: ${data}`);
-    });
-
-    insertProcess.on('close', (code) => {
-      if (code !== 0) {
-        vscode.window.showErrorMessage(`Error: child process exited with code ${code}`);
-        return;
-      }
-
-      if (insertStdout.trim() === 'true') {
-        const editor = vscode.window.activeTextEditor;
-        editor.edit((editBuilder) => {
-          const selection = editor.selection;
-          editBuilder.replace(selection, translatedText);
-        });
-      }
-    });
-  }
+module.exports = {
+  launchEdit
 };

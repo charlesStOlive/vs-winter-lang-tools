@@ -2,7 +2,7 @@
   "name": "vs-winter-lang-tools",
   "displayName": "vs-winter-lang-tools",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/charlesStOlive/vs-winter-lang-tools.git"
@@ -16,25 +16,88 @@
   "activationEvents": [],
   "main": "./src/main.js",
   "contributes": {
+    "views": {
+        "explorer": [
+            {
+                "id": "langTreeView",
+                "name": "Lang des plugins",
+                "when": "true"
+            }
+        ]
+    },
+    "resources": {
+        "icons": [
+            {
+                "id": "error",
+                "path": "images/error-icon.svg"
+            }
+        ]
+    },
     "commands": [
       {
-        "command": "vs-winter-lang-tools.analyzeCode",
-        "title": "Vérifier tous les fichiers"
+        "command": "vs-winter-lang-tools.updateLangFromArtisan",
+        "title": "launch simple trad"
       },
       {
-        "command": "vs-winter-lang-tools.runPhpArtisan",
+        "command": "vs-winter-lang-tools.searchLangFromArtisan",
         "title": "launch simple trad"
+      },
+      {
+        "command": "vs-winter-lang-tools.updateTreeView",
+        "title": "Update Tree View"
+      },
+      {
+        "command": "extension.searchLangKey",
+        "title": "Rechercher la clef"
+      },
+      {
+        "command": "extension.saveLangKey",
+        "title": "Editer"
+      },
+      {
+        "command": "extension.openLang",
+        "title": "Ouvrir la page de lang"
+      },
+      {
+        "command": "extension.copyLangKey",
+        "title": "Copier le code"
       }
+      
     ],
+    "menus": {
+      "view/item/context": [
+        
+        {
+          "when": "view == langTreeView && viewItem == leafKey",
+          "command": "extension.saveLangKey",
+          "group": "1_modification"
+        },
+        {
+          "when": "view == langTreeView && viewItem == leafKey",
+          "command": "extension.copyLangKey",
+          "group": "1_modification"
+        },
+        {
+          "when": "view == langTreeView && (viewItem == leafKey || viewItem == nestedKey)",
+          "command": "extension.openLang",
+          "group": "1_modification"
+        },
+        {
+          "when": "view == langTreeView && (viewItem == leafKey || viewItem == nestedKey)",
+          "command": "extension.searchLangKey",
+          "group": "1_modification"
+        }
+      ]
+    },
     "keybindings": [
       {
-        "command": "vs-winter-lang-tools.analyzeCode",
-        "key": "ctrl+alt+1",
+        "command": "vs-winter-lang-tools.updateLangFromArtisan",
+        "key": "ctrl+alt+t",
         "when": "editorTextFocus"
       },
       {
-        "command": "vs-winter-lang-tools.runPhpArtisan",
-        "key": "ctrl+alt+t",
+         "command": "vs-winter-lang-tools.searchLangFromArtisan",
+        "key": "ctrl+alt+r",
         "when": "editorTextFocus"
       }
     ],
