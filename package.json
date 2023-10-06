@@ -1,14 +1,14 @@
 {
   "name": "vs-winter-lang-tools",
   "displayName": "vs-winter-lang-tools",
-  "description": "",
-  "version": "0.1.1",
+  "description": "Permet de travailler avec les fichiers de langue",
+  "version": "1.1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/charlesStOlive/vs-winter-lang-tools.git"
   },
   "engines": {
-    "vscode": "^1.76.0"
+    "vscode": "^1.83.0"
   },
   "categories": [
     "Other"
