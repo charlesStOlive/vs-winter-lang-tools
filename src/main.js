@@ -3,23 +3,33 @@ const fs = require('fs');
 const path = require('path');
 const updateLangFromArtisan = require('./updateLangFromArtisan');
 const searchLangFromArtisan = require('./searchLangFromArtisan');
-const { launchEdit } = require('./translationUtils');
+const { launchEdit, launchCkeckTrad } = require('./translationUtils');
 const JsonTreeProvider = require('./jsonTreeProvider');
 
 
-function activate(context) {
+async  function activate(context) {
+  
+  //
   let runUpdateLang = vscode.commands.registerCommand('vs-winter-lang-tools.updateLangFromArtisan', updateLangFromArtisan);
   context.subscriptions.push(runUpdateLang);
 
   let runSearchFromArtisan = vscode.commands.registerCommand('vs-winter-lang-tools.searchLangFromArtisan', searchLangFromArtisan);
   context.subscriptions.push(runSearchFromArtisan);
+  try {
+  console.log('before searchLangFromArtisan');
+  await vscode.commands.executeCommand('vs-winter-lang-tools.searchLangFromArtisan');
+  console.log('after searchLangFromArtisan');
+} catch (error) {
+  console.error('Error executing command:', error);
+}
 
-  vscode.commands.executeCommand('vs-winter-lang-tools.searchLangFromArtisan');
-
-  let jsonTreeProvider = new JsonTreeProvider({});
+  const  jsonTreeProvider = new JsonTreeProvider({});
   vscode.window.registerTreeDataProvider('langTreeView', jsonTreeProvider);
 
+  
+
   vscode.commands.registerCommand('vs-winter-lang-tools.updateTreeView', (newData) => {
+    console.log('vs-winter-lang-tools.updateTreeView', newData)
     jsonTreeProvider.jsonData = newData;
     jsonTreeProvider.refresh();
   });
@@ -44,51 +54,33 @@ function activate(context) {
     vscode.window.showInformationMessage(`Saving: ${node.label}`);
     let newString = node.keyPath.replace(".lang", "::lang");
     launchEdit(newString);
-    // Ici vous implémentez la logique pour la sauvegarde de la clé de langage
   });
   context.subscriptions.push(myCommand2);
 
   let myCommand3 = vscode.commands.registerCommand('extension.openLang', (node) => {
-    console.log(node.keyPath);
-
     // Gérer le cas où aucun dossier n'est ouvert.
     if (!vscode.workspace.workspaceFolders) {
       vscode.window.showErrorMessage('No folder is open.');
       return;
     }
-
     // Diviser la clé en composants.
     const parts = node.keyPath.split('.');
-
     if (parts.length < 2) {
       vscode.window.showErrorMessage('Key path format invalid');
       return;
     }
-
     // Obtenir le chemin du répertoire de travail
     const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-    console.log(rootPath)
-
     // Vérifier que le chemin n'est pas nul
     if (!rootPath) {
       vscode.window.showErrorMessage('No root path found.');
       return;
     }
-
     // Construction du chemin d'accès au fichier.
     const vendor = parts[0];
     const plugin = parts[1];
     const fileName = 'lang.php';
-
-    console.log(rootPath)
-    console.log(vendor)
-    console.log(plugin)
-    console.log(fileName)
-
-
     const filePath = path.join(rootPath, 'plugins', vendor, plugin, 'lang', 'fr', fileName);
-    
-
     // Vérification de l'existence du fichier.
     fs.access(filePath, fs.constants.F_OK, (err) => {
       if (err) {
@@ -112,6 +104,20 @@ function activate(context) {
     // Ici vous implémentez la logique pour la sauvegarde de la clé de langage
   });
   context.subscriptions.push(myCommand4);
+
+  const myCommand5 = vscode.commands.registerCommand('extension.relaunchSearch', (node) => {
+    vscode.window.showInformationMessage('Je relance la recherche des langues');
+    vscode.commands.executeCommand('vs-winter-lang-tools.searchLangFromArtisan');
+    // Ici vous implémentez la logique pour la sauvegarde de la clé de langage
+  });
+  context.subscriptions.push(myCommand5);
+
+   const myCommand6 = vscode.commands.registerCommand('extension.launchCheckTradCommand', (node) => {
+    vscode.window.showInformationMessage('Je lance waka Checktrads');
+    launchCkeckTrad(context);
+    // Ici vous implémentez la logique pour la sauvegarde de la clé de langage
+  });
+  context.subscriptions.push(myCommand6);
 }
 exports.activate = activate;
 

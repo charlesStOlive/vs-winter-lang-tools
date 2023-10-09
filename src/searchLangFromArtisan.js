@@ -2,6 +2,7 @@ const vscode = require('vscode');
 const { spawn } = require('child_process');
 
 module.exports = async function searchLangFromArtisan() {
+    vscode.window.showInformationMessage('Je lance la recherche des langues et la maj du tree lang view');
     const editor = vscode.window.activeTextEditor;
 
     if (!editor) {
@@ -28,8 +29,10 @@ module.exports = async function searchLangFromArtisan() {
     getProcess.stdout.on('close', () => {
         try {
             const parsedData = JSON.parse(stdout);
+            console.log()
             // Mettez à jour la vue d'arbre avec les nouvelles données
             vscode.commands.executeCommand('vs-winter-lang-tools.updateTreeView', parsedData);
+            vscode.window.showInformationMessage('MAJ du Lang des plugins : OK');
         } catch (e) {
             console.log('Erreur lors de la conversion de la sortie en JSON:', e);
         }

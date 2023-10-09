@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Output</title>
+    <script>
+    document.addEventListener('click', function(event) {
+        var target = event.target;
+        while (target) {
+            if (target.tagName.toLowerCase() === 'a') {
+                const path = target.getAttribute('data-path');
+                window.acquireVsCodeApi().postMessage({
+                    command: 'openFile',
+                    path: path,
+                });
+                event.preventDefault();
+                return;
+            }
+            target = target.parentElement;
+        }
+    }, true);
+</script>
+</head>
+<body>
+    ${lines}
+</body>
+</html>
